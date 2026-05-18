@@ -1,1 +1,343 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BF BITES - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos específicos do login */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #F9F9F9 0%, #FFFFFF 100%);
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            color: #C62828;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .slogan {
+            text-align: center;
+            color: #FF9800;
+            font-style: italic;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #DDD;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #FFC107;
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.1);
+        }
+        
+        .input-group input.error {
+            border-color: #f44336;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+        
+        .btn-primary {
+            background: #FFC107;
+            color: #222;
+        }
+        
+        .btn-primary:hover {
+            background: #FFB300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+        }
+        
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #D0D0D0;
+            transform: translateY(-2px);
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .forgot-password a {
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        .toast.success {
+            background: #4CAF50;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .counter {
+            text-align: center;
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">🍔</div>
+                <h1>BF BITES</h1>
+            </div>
+            <div class="slogan">O sabor oficial do Barbosa Ferraz</div>
+            
+            <div class="input-group">
+                <label>👤 Usuário</label>
+                <input type="text" id="username" placeholder="Digite seu nome ou RA">
+                <div class="error-message" id="usernameError">Campo obrigatório</div>
+            </div>
+            
+            <div class="input-group">
+                <label>🔒 Senha</label>
+                <input type="password" id="password" placeholder="********">
+                <div class="error-message" id="passwordError">Campo obrigatório</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="login('aluno')">🎓 Entrar como Aluno</button>
+            <button class="btn btn-secondary" onclick="login('funcionario')">👔 Entrar como Funcionário</button>
+            
+            <div class="forgot-password">
+                <a href="#" onclick="showForgotPassword()">Esqueci minha senha</a>
+            </div>
+            
+            <div class="counter" id="counter">
+                ⏱️ Aguarde <span id="counterSeconds">30</span> segundos
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        let loginAttempts = 0;
+        let blockedUntil = null;
+        
+        // Credenciais mockadas
+        const users = {
+            aluno: { username: 'aluno', password: '123', name: 'João Silva' },
+            funcionario: { username: 'admin', password: 'admin', name: 'Funcionário' }
+        };
+        
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        function showForgotPassword() {
+            showToast('🔧 Contate o administrador da cantina para recuperar sua senha.', 'success');
+        }
+        
+        function validateFields() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            let isValid = true;
+            
+            if (!username) {
+                document.getElementById('usernameError').style.display = 'block';
+                document.getElementById('username').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('usernameError').style.display = 'none';
+                document.getElementById('username').classList.remove('error');
+            }
+            
+            if (!password) {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('password').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+                document.getElementById('password').classList.remove('error');
+            }
+            
+            return isValid;
+        }
+        
+        function login(type) {
+            // Verificar bloqueio
+            if (blockedUntil && new Date() < blockedUntil) {
+                const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
+                showToast(`Aguardando ${remaining} segundos para nova tentativa`, 'error');
+                return;
+            }
+            
+            if (!validateFields()) return;
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (type === 'aluno') {
+                if (username === users.aluno.username && password === users.aluno.password) {
+                    localStorage.setItem('userType', 'aluno');
+                    localStorage.setItem('userName', users.aluno.name);
+                    loginAttempts = 0;
+                    window.location.href = 'aluno.html';
+                } else {
+                    loginAttempts++;
+                    showToast('❌ Usuário ou senha inválidos', 'error');
+                }
+            } else if (type === 'funcionario') {
+                if (username === users.funcionario.username && password === users.funcionario.password) {
+                    localStorage.setItem('userType', 'funcionario');
+                    localStorage.setItem('userName', users.funcionario.name);
+                    loginAttempts = 0;
+                    window.location.href = 'funcionario.html';
+                } else {
+                    loginAttempts++;
+                    showToast('❌ Usuário ou senha inválidos', 'error');
+                }
+            }
+            
+            // Verificar bloqueio após 3 tentativas
+            if (loginAttempts >= 3) {
+                blockedUntil = new Date(new Date().getTime() + 30000);
+                const counter = document.getElementById('counter');
+                const counterSeconds = document.getElementById('counterSeconds');
+                counter.style.display = 'block';
+                
+                const interval = setInterval(() => {
+                    const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
+                    if (remaining <= 0) {
+                        clearInterval(interval);
+                        counter.style.display = 'none';
+                        loginAttempts = 0;
+                    } else {
+                        counterSeconds.textContent = remaining;
+                    }
+                }, 1000);
+                
+                showToast('🔒 Muitas tentativas! Aguarde 30 segundos.', 'error');
+            }
+        }
+        
+        // Verificar se já está logado
+        if (localStorage.getItem('userType')) {
+            const userType = localStorage.getItem('userType');
+            if (userType === 'aluno') {
+                window.location.href = 'aluno.html';
+            } else if (userType === 'funcionario') {
+                window.location.href = 'funcionario.html';
+            }
+        }
+    </script>
+</body>
+</html>
