@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -214,5 +213,123 @@
             if (notifNaoLidas.length > 0) {
                 notifArea.innerHTML = notifNaoLidas.slice(0, 3).map(notif => `
                     <div class="notification-banner ${notif.tipo === 'success' ? 'success' : 'warning'}">
-                        <span>${notif.mensagem}</span
-                        
+                        <span>${notif.mensagem}</span>
+                        <button class="btn btn-small" onclick="fecharNotificacao(${notif.id})">✖</button>
+                    </div>
+                `).join('');
+                
+                const badge = document.getElementById('notifBadge');
+                badge.textContent = notifNaoLidas.length;
+                badge.style.display = 'flex';
+            } else {
+                notifArea.innerHTML = '';
+                document.getElementById('notifBadge').style.display = 'none';
+            }
+        }
+        
+        function fecharNotificacao(id) {
+            const notif = db.notificacoes.find(n => n.id === id);
+            if (notif) notif.lida = true;
+            carregarNotificacoes();
+        }
+        
+        function abrirModalPedido() {
+            const select = document.getElementById('saborSelect');
+            select.innerHTML = '<option value="">Selecione um sabor</option>';
+            
+            db.sabores.forEach(sabor => {
+                if (sabor.quantidade > 0) {
+                    select.innerHTML += `<option value="${sabor.id}">${sabor.icone} ${sabor.nome} - R$ ${sabor.preco.toFixed(2)}</option>`;
+                }
+            });
+            
+            document.getElementById('modalPedido').style.display = 'flex';
+        }
+        
+        function fecharModalPedido() {
+            document.getElementById('modalPedido').style.display = 'none';
+        }
+        
+        function alterarQuantidade(delta) {
+            const input = document.getElementById('quantidadePedido');
+            let valor = parseInt(input.value) + delta;
+            if (valor < 1) valor = 1;
+            if (valor > 10) valor = 10;
+            input.value = valor;
+        }
+        
+        function fazerPedido() {
+            const saborId = parseInt(document.getElementById('saborSelect').value);
+            const quantidade = parseInt(document.getElementById('quantidadePedido').value);
+            
+            if (!saborId) {
+                alert('Selecione um sabor!');
+                return;
+            }
+            
+            const sabor = db.getSaborById(saborId);
+            if (!sabor || sabor.quantidade < quantidade) {
+                alert(`Estoque insuficiente! Disponível: ${sabor?.quantidade || 0}`);
+                return;
+            }
+            
+            const novoPedido = {
+                id: db.pedidos.length + 1,
+                cliente: currentUser,
+                saborId: saborId,
+                saborNome: sabor.nome,
+                quantidade: quantidade,
+                status: 'pendente',
+                data: new Date().toISOString()
+            };
+            
+            db.addPedido(novoPedido);
+            fecharModalPedido();
+            carregarPedidos();
+            carregarSabores();
+            
+            alert('✅ Pedido realizado com sucesso! Aguarde a confirmação.');
+        }
+        
+        function openNotificacoes() {
+            const modal = document.getElementById('modalNotificacoes');
+            const lista = document.getElementById('listaNotificacoes');
+            
+            if (db.notificacoes.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: #999;">Nenhuma notificação</p>';
+            } else {
+                lista.innerHTML = db.notificacoes.map(notif => `
+                    <div class="notification-banner ${notif.tipo === 'success' ? 'success' : 'warning'}" style="margin-bottom: 8px;">
+                        <div>
+                            <div>${notif.mensagem}</div>
+                            <small style="color: #999;">${new Date(notif.data).toLocaleTimeString()}</small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.style.display = 'flex';
+            db.marcarNotificacoesComoLidas();
+            carregarNotificacoes();
+        }
+        
+        function fecharModalNotificacoes() {
+            document.getElementById('modalNotificacoes').style.display = 'none';
+        }
+        
+        // Inicializar
+        document.getElementById('userName').textContent = localStorage.getItem('userName') || 'Aluno';
+        currentUser = localStorage.getItem('userName') || 'Aluno';
+        carregarSabores();
+        carregarPedidos();
+        carregarNotificacoes();
+        
+        // Auto-refresh a cada 10 segundos
+        setInterval(() => {
+            carregarSabores();
+            carregarPedidos();
+            carregarNotificacoes();
+        }, 10000);
+    </script>
+</body>
+</html>
