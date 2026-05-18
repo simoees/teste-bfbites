@@ -1,1 +1,399 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BF BITES - Funcionário</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🍔 BF BITES</h1>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="abrirConfiguracoes()">⚙️</button>
+            <button class="icon-btn" onclick="logout()">🚪</button>
+        </div>
+    </div>
+    
+    <div class="welcome">
+        <h2>Olá, Funcionário(a)!</h2>
+        <p>Gerencie pedidos e estoque</p>
+    </div>
+    
+    <div class="container">
+        <!-- Área de notificações -->
+        <div id="alertasArea"></div>
+        
+        <!-- Seção de pedidos -->
+        <div class="section">
+            <div class="section-title">
+                <span>📦 PEDIDOS DO DIA</span>
+                <button class="btn btn-small btn-secondary" onclick="carregarPedidos()">🔄 Atualizar</button>
+            </div>
+            <div id="pedidosLista"></div>
+        </div>
+        
+        <!-- Seção de estoque -->
+        <div class="section">
+            <div class="section-title">
+                <span>📦 ESTOQUE DE ESFIRRAS</span>
+                <button class="btn btn-small btn-primary" onclick="abrirModalEstoque()">➕ ADICIONAR ESTOQUE</button>
+            </div>
+            <div id="estoqueGrid" class="estoque-grid"></div>
+        </div>
+        
+        <!-- Controles de expediente -->
+        <div class="section">
+            <div class="section-title">
+                <span>⚙️ CONTROLES</span>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-danger" onclick="encerrarExpediente()">🚪 ENCERRAR EXPEDIENTE</button>
+                <button class="btn btn-secondary" onclick="gerarRelatorio()">📊 RELATÓRIO DO DIA</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de editar pedido -->
+    <div id="modalEditarPedido" class="modal">
+        <div class="modal-content">
+            <h3>✏️ Editar Pedido</h3>
+            <input type="hidden" id="editPedidoId">
+            <div class="input-group">
+                <label>Cliente:</label>
+                <input type="text" id="editCliente" readonly style="background: #F5F5F5;">
+            </div>
+            <div class="input-group">
+                <label>Sabor:</label>
+                <select id="editSabor" class="sabor-select"></select>
+            </div>
+            <div class="input-group">
+                <label>Quantidade:</label>
+                <input type="number" id="editQuantidade" min="1" max="20">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="salvarEdicaoPedido()">💾 Salvar</button>
+                <button class="btn btn-danger" onclick="cancelarPedido()">❌ Cancelar Pedido</button>
+                <button class="btn btn-secondary" onclick="fecharModalEditar()">Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de adicionar estoque -->
+    <div id="modalEstoque" class="modal">
+        <div class="modal-content">
+            <h3>➕ Adicionar Estoque</h3>
+            <div class="input-group">
+                <label>Sabor:</label>
+                <select id="estoqueSabor" class="sabor-select"></select>
+            </div>
+            <div class="input-group">
+                <label>Quantidade a adicionar:</label>
+                <input type="number" id="estoqueQuantidade" placeholder="Ex: 20" min="1" max="100">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="adicionarEstoque()">✅ Confirmar</button>
+                <button class="btn btn-secondary" onclick="fecharModalEstoque()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de configurações -->
+    <div id="modalConfig" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ Configurações</h3>
+            <button class="btn btn-danger" onclick="resetarTudo()" style="width: 100%; margin-bottom: 12px;">🔄 Resetar Sistema</button>
+            <button class="btn btn-secondary" onclick="limparHistorico()" style="width: 100%; margin-bottom: 12px;">🗑️ Limpar Histórico</button>
+            <button class="btn btn-secondary" onclick="fecharModalConfig()">Fechar</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <button onclick="window.location.reload()">🏠</button>
+        <button onclick="carregarPedidos()">📦</button>
+        <button onclick="abrirModalEstoque()">📊</button>
+        <button onclick="logout()">👤 Sair</button>
+    </div>
+    
+    <script src="dados.js"></script>
+    <script>
+        let pedidoEditando = null;
+        
+        function logout() {
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userName');
+            window.location.href = 'index.html';
+        }
+        
+        function carregarPedidos() {
+            const lista = document.getElementById('pedidosLista');
+            
+            if (db.pedidos.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: #999;">Nenhum pedido pendente</p>';
+                return;
+            }
+            
+            lista.innerHTML = '';
+            db.pedidos.forEach((pedido, index) => {
+                const card = document.createElement('div');
+                card.className = 'pedido-item';
+                card.style.flexDirection = 'column';
+                card.style.alignItems = 'stretch';
+                
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div>
+                            <strong>PEDIDO ${String(index + 1).padStart(2, '0')}</strong>
+                            <div style="font-size: 14px; margin-top: 4px;">${pedido.cliente} = ${pedido.quantidade} ESFIRRA(S) DE ${pedido.saborNome}</div>
+                        </div>
+                        <div class="pedido-status status-pendente">⏳ Pendente</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-success btn-small" onclick="entregarPedido(${pedido.id})">✅ ENTREGUE</button>
+                        <button class="btn btn-secondary btn-small" onclick="abrirModalEditar(${pedido.id})">✏️ EDITAR</button>
+                    </div>
+                `;
+                
+                lista.appendChild(card);
+            });
+        }
+        
+        function entregarPedido(pedidoId) {
+            if (db.concluirPedido(pedidoId)) {
+                showAlert('✅ Pedido entregue com sucesso!', 'success');
+                carregarPedidos();
+                carregarEstoque();
+                verificarEstoqueBaixo();
+            } else {
+                showAlert('❌ Estoque insuficiente! Reponha antes de entregar.', 'error');
+            }
+        }
+        
+        function abrirModalEditar(pedidoId) {
+            pedidoEditando = db.pedidos.find(p => p.id === pedidoId);
+            if (!pedidoEditando) return;
+            
+            document.getElementById('editPedidoId').value = pedidoEditando.id;
+            document.getElementById('editCliente').value = pedidoEditando.cliente;
+            document.getElementById('editQuantidade').value = pedidoEditando.quantidade;
+            
+            const select = document.getElementById('editSabor');
+            select.innerHTML = '';
+            db.sabores.forEach(sabor => {
+                select.innerHTML += `<option value="${sabor.id}" ${sabor.id === pedidoEditando.saborId ? 'selected' : ''}>
+                    ${sabor.icone} ${sabor.nome}
+                </option>`;
+            });
+            
+            document.getElementById('modalEditarPedido').style.display = 'flex';
+        }
+        
+        function salvarEdicaoPedido() {
+            const novoSaborId = parseInt(document.getElementById('editSabor').value);
+            const novaQuantidade = parseInt(document.getElementById('editQuantidade').value);
+            
+            if (pedidoEditando) {
+                const novoSabor = db.getSaborById(novoSaborId);
+                pedidoEditando.saborId = novoSaborId;
+                pedidoEditando.saborNome = novoSabor.nome;
+                pedidoEditando.quantidade = novaQuantidade;
+                
+                showAlert('✅ Pedido atualizado!', 'success');
+                fecharModalEditar();
+                carregarPedidos();
+            }
+        }
+        
+        function cancelarPedido() {
+            if (pedidoEditando && confirm('Cancelar este pedido?')) {
+                db.cancelarPedido(pedidoEditando.id);
+                showAlert('❌ Pedido cancelado!', 'warning');
+                fecharModalEditar();
+                carregarPedidos();
+            }
+        }
+        
+        function fecharModalEditar() {
+            document.getElementById('modalEditarPedido').style.display = 'none';
+            pedidoEditando = null;
+        }
+        
+        function carregarEstoque() {
+            const grid = document.getElementById('estoqueGrid');
+            grid.innerHTML = '';
+            
+            db.sabores.forEach(sabor => {
+                let classe = '';
+                if (sabor.quantidade === 0) classe = 'zerado';
+                else if (sabor.quantidade < 10) classe = 'baixo';
+                
+                const item = document.createElement('div');
+                item.className = 'estoque-item';
+                item.innerHTML = `
+                    <div class="estoque-nome">${sabor.icone} ${sabor.nome}</div>
+                    <div class="estoque-valor ${classe}">${sabor.quantidade}</div>
+                    ${sabor.quantidade === 0 ? '<button class="btn btn-small btn-primary" onclick="abrirModalEstoqueComSabor(' + sabor.id + ')">REPOR</button>' : ''}
+                `;
+                grid.appendChild(item);
+            });
+        }
+        
+        function abrirModalEstoque() {
+            const select = document.getElementById('estoqueSabor');
+            select.innerHTML = '';
+            db.sabores.forEach(sabor => {
+                select.innerHTML += `<option value="${sabor.id}">${sabor.icone} ${sabor.nome} (Atual: ${sabor.quantidade})</option>`;
+            });
+            document.getElementById('estoqueQuantidade').value = '';
+            document.getElementById('modalEstoque').style.display = 'flex';
+        }
+        
+        function abrirModalEstoqueComSabor(saborId) {
+            const select = document.getElementById('estoqueSabor');
+            select.innerHTML = '';
+            db.sabores.forEach(sabor => {
+                select.innerHTML += `<option value="${sabor.id}" ${sabor.id === saborId ? 'selected' : ''}>
+                    ${sabor.icone} ${sabor.nome} (Atual: ${sabor.quantidade})
+                </option>`;
+            });
+            document.getElementById('estoqueQuantidade').value = '';
+            document.getElementById('modalEstoque').style.display = 'flex';
+        }
+        
+        function fecharModalEstoque() {
+            document.getElementById('modalEstoque').style.display = 'none';
+        }
+        
+        function adicionarEstoque() {
+            const saborId = parseInt(document.getElementById('estoqueSabor').value);
+            const quantidade = parseInt(document.getElementById('estoqueQuantidade').value);
+            
+            if (!quantidade || quantidade < 1 || quantidade > 100) {
+                showAlert('❌ Quantidade inválida! (1 a 100)', 'error');
+                return;
+            }
+            
+            db.updateEstoque(saborId, quantidade);
+            showAlert(`✅ Estoque atualizado! +${quantidade} unidades`, 'success');
+            fecharModalEstoque();
+            carregarEstoque();
+            verificarEstoqueBaixo();
+        }
+        
+        function verificarEstoqueBaixo() {
+            const estoqueBaixo = db.sabores.filter(s => s.quantidade <= 5 && s.quantidade > 0);
+            const estoqueZerado = db.sabores.filter(s => s.quantidade === 0);
+            
+            const alertas = document.getElementById('alertasArea');
+            alertas.innerHTML = '';
+            
+            if (estoqueBaixo.length > 0) {
+                alertas.innerHTML += `
+                    <div class="notification-banner warning">
+                        <span>⚠️ ESTOQUE BAIXO: ${estoqueBaixo.map(s => s.nome).join(', ')}</span>
+                        <button class="btn btn-small btn-primary" onclick="abrirModalEstoque()">REPOR AGORA</button>
+                    </div>
+                `;
+            }
+            
+            if (estoqueZerado.length > 0) {
+                alertas.innerHTML += `
+                    <div class="notification-banner warning">
+                        <span>❌ ESGOTADO: ${estoqueZerado.map(s => s.nome).join(', ')}</span>
+                        <button class="btn btn-small btn-primary" onclick="abrirModalEstoque()">REPOR</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function encerrarExpediente() {
+            if (confirm('Finalizar o dia? Todos os pedidos não entregues serão cancelados.')) {
+                const resumo = db.encerrarExpediente();
+                showAlert(`✅ Expediente encerrado! Total vendido: ${resumo.pedidosEntregues} pedidos`, 'success');
+                
+                setTimeout(() => {
+                    logout();
+                }, 3000);
+            }
+        }
+        
+        function gerarRelatorio() {
+            const totalVendas = db.historicoPedidos.filter(p => p.status === 'entregue').length;
+            const totalEsfirras = db.historicoPedidos.reduce((sum, p) => sum + p.quantidade, 0);
+            
+            let relatorio = `📊 RELATÓRIO DO DIA\n`;
+            relatorio += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+            relatorio += `📦 Pedidos entregues: ${totalVendas}\n`;
+            relatorio += `🍔 Esfirras vendidas: ${totalEsfirras}\n`;
+            relatorio += `💰 Faturamento: R$ ${(totalEsfirras * 5).toFixed(2)}\n`;
+            relatorio += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+            relatorio += `📋 Vendas por sabor:\n`;
+            
+            const vendasPorSabor = {};
+            db.historicoPedidos.forEach(p => {
+                if (!vendasPorSabor[p.saborNome]) vendasPorSabor[p.saborNome] = 0;
+                vendasPorSabor[p.saborNome] += p.quantidade;
+            });
+            
+            for (const [sabor, qtd] of Object.entries(vendasPorSabor)) {
+                relatorio += `  • ${sabor}: ${qtd} unidades\n`;
+            }
+            
+            alert(relatorio);
+        }
+        
+        function abrirConfiguracoes() {
+            document.getElementById('modalConfig').style.display = 'flex';
+        }
+        
+        function fecharModalConfig() {
+            document.getElementById('modalConfig').style.display = 'none';
+        }
+        
+        function resetarTudo() {
+            if (confirm('⚠️ ATENÇÃO! Isso irá resetar TODO o sistema. Continuar?')) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+        
+        function limparHistorico() {
+            if (confirm('Limpar histórico de pedidos?')) {
+                db.historicoPedidos = [];
+                showAlert('✅ Histórico limpo!', 'success');
+                fecharModalConfig();
+            }
+        }
+        
+        function showAlert(mensagem, tipo) {
+            const alertaDiv = document.createElement('div');
+            alertaDiv.className = `notification-banner ${tipo === 'success' ? 'success' : 'warning'}`;
+            alertaDiv.style.position = 'fixed';
+            alertaDiv.style.top = '80px';
+            alertaDiv.style.left = '20px';
+            alertaDiv.style.right = '20px';
+            alertaDiv.style.zIndex = '1000';
+            alertaDiv.innerHTML = `
+                <span>${mensagem}</span>
+                <button class="btn btn-small" onclick="this.parentElement.remove()">✖</button>
+            `;
+            
+            document.body.appendChild(alertaDiv);
+            setTimeout(() => alertaDiv.remove(), 3000);
+        }
+        
+        // Inicializar
+        carregarPedidos();
+        carregarEstoque();
+        verificarEstoqueBaixo();
+        
+        // Auto-refresh
+        setInterval(() => {
+            carregarPedidos();
+            carregarEstoque();
+            verificarEstoqueBaixo();
+        }, 5000);
+    </script>
+</body>
+</html>
