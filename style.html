@@ -1,1 +1,399 @@
 
+/* Reset e estilos globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #F9F9F9;
+    color: #222;
+}
+
+/* Header padrão */
+.header {
+    background: #C62828;
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: #FFC107;
+    color: #222;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.welcome {
+    background: linear-gradient(135deg, #C62828 0%, #8B0000 100%);
+    padding: 20px;
+    color: white;
+}
+
+.welcome h2 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.welcome p {
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+/* Container principal */
+.container {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+}
+
+/* Seções */
+.section {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #222;
+}
+
+/* Cards de sabores */
+.sabores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.sabor-card {
+    background: #F9F9F9;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #DDD;
+    transition: all 0.3s;
+}
+
+.sabor-card.esgotado {
+    opacity: 0.5;
+}
+
+.sabor-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.sabor-nome {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sabor-quantidade {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sabor-quantidade.disponivel {
+    color: #4CAF50;
+}
+
+.sabor-quantidade.baixo {
+    color: #FF9800;
+}
+
+.sabor-quantidade.zerado {
+    color: #f44336;
+}
+
+.esgotado-tag {
+    display: inline-block;
+    background: #f44336;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+/* Lista de pedidos */
+.pedidos-lista {
+    list-style: none;
+}
+
+.pedido-item {
+    background: #F9F9F9;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #FFC107;
+}
+
+.pedido-info {
+    flex: 1;
+}
+
+.pedido-nome {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.pedido-detalhes {
+    font-size: 12px;
+    color: #666;
+}
+
+.pedido-status {
+    font-size: 20px;
+}
+
+.status-pendente {
+    color: #FF9800;
+}
+
+.status-pronto {
+    color: #4CAF50;
+}
+
+/* Botões */
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #FFC107;
+    color: #222;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: #E0E0E0;
+    color: #333;
+}
+
+.btn-danger {
+    background: #f44336;
+    color: white;
+}
+
+.btn-success {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 350px;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h3 {
+    margin-bottom: 16px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #DDD;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-buttons button {
+    flex: 1;
+}
+
+/* Banner de notificação */
+.notification-banner {
+    background: #FFF3E0;
+    border-left: 4px solid #FF9800;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-banner.success {
+    background: #E8F5E9;
+    border-left-color: #4CAF50;
+}
+
+.notification-banner.warning {
+    background: #FFF3E0;
+    border-left-color: #FF9800;
+}
+
+/* Estoque grid */
+.estoque-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.estoque-item {
+    background: #F9F9F9;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.estoque-nome {
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.estoque-valor {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.estoque-valor.baixo {
+    color: #FF9800;
+}
+
+.estoque-valor.zerado {
+    color: #f44336;
+}
+
+/* Rodapé */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    border-top: 1px solid #DDD;
+}
+
+.footer button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.footer button:hover {
+    background: #F0F0F0;
+}
+
+/* Scroll */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F1F1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C62828;
+    border-radius: 3px;
+}
