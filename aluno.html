@@ -1,1 +1,218 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BF BITES - Aluno</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .fazer-pedido-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #FFC107;
+            color: #222;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s;
+        }
+        
+        .fazer-pedido-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .modal-pedido {
+            max-width: 400px;
+        }
+        
+        .sabor-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #DDD;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+        
+        .quantidade-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .quantidade-input button {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: #FFC107;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .quantidade-input input {
+            flex: 1;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍔 BF BITES</h1>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="openNotificacoes()">
+                🔔
+                <span id="notifBadge" class="badge" style="display: none;">0</span>
+            </button>
+            <button class="icon-btn" onclick="logout()">🚪</button>
+        </div>
+    </div>
+    
+    <div class="welcome">
+        <h2>Olá, <span id="userName"></span>!</h2>
+        <p>Faça seu pedido e acompanhe o status</p>
+    </div>
+    
+    <div class="container">
+        <!-- Seção de notificações -->
+        <div id="notificacoesArea"></div>
+        
+        <!-- Seção de sabores -->
+        <div class="section">
+            <div class="section-title">
+                <span>🍕 SABORES DO DIA</span>
+                <button class="btn btn-small btn-secondary" onclick="carregarSabores()">🔄 Atualizar</button>
+            </div>
+            <div id="saboresGrid" class="sabores-grid"></div>
+        </div>
+        
+        <!-- Seção de meus pedidos -->
+        <div class="section">
+            <div class="section-title">
+                <span>📋 MEUS PEDIDOS ATIVOS</span>
+                <button class="btn btn-small btn-secondary" onclick="carregarPedidos()">🔄 Atualizar</button>
+            </div>
+            <div id="pedidosLista"></div>
+        </div>
+    </div>
+    
+    <!-- Botão flutuante para fazer pedido -->
+    <button class="fazer-pedido-btn" onclick="abrirModalPedido()">➕</button>
+    
+    <!-- Modal de fazer pedido -->
+    <div id="modalPedido" class="modal">
+        <div class="modal-content modal-pedido">
+            <h3>🍔 Fazer Pedido</h3>
+            <select id="saborSelect" class="sabor-select">
+                <option value="">Selecione um sabor</option>
+            </select>
+            <div class="quantidade-input">
+                <button onclick="alterarQuantidade(-1)">-</button>
+                <input type="number" id="quantidadePedido" value="1" min="1" max="10">
+                <button onclick="alterarQuantidade(1)">+</button>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="fazerPedido()">✅ Confirmar</button>
+                <button class="btn btn-secondary" onclick="fecharModalPedido()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de notificações -->
+    <div id="modalNotificacoes" class="modal">
+        <div class="modal-content">
+            <h3>🔔 Notificações</h3>
+            <div id="listaNotificacoes" style="max-height: 400px; overflow-y: auto;"></div>
+            <button class="btn btn-secondary" onclick="fecharModalNotificacoes()" style="margin-top: 16px;">Fechar</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <button onclick="window.location.reload()">🏠</button>
+        <button onclick="openNotificacoes()">🔔</button>
+        <button onclick="logout()">👤 Sair</button>
+    </div>
+    
+    <script src="dados.js"></script>
+    <script>
+        let currentUser = 'João Silva';
+        
+        function logout() {
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userName');
+            window.location.href = 'index.html';
+        }
+        
+        function carregarSabores() {
+            const grid = document.getElementById('saboresGrid');
+            grid.innerHTML = '';
+            
+            db.sabores.forEach(sabor => {
+                const card = document.createElement('div');
+                card.className = `sabor-card ${sabor.quantidade === 0 ? 'esgotado' : ''}`;
+                
+                let quantidadeClass = 'disponivel';
+                if (sabor.quantidade === 0) quantidadeClass = 'zerado';
+                else if (sabor.quantidade < 10) quantidadeClass = 'baixo';
+                
+                card.innerHTML = `
+                    <div class="sabor-icon">${sabor.icone}</div>
+                    <div class="sabor-nome">${sabor.nome}</div>
+                    <div class="sabor-quantidade ${quantidadeClass}">
+                        ${sabor.quantidade > 0 ? `📦 ${sabor.quantidade}` : '❌ ESGOTADO'}
+                    </div>
+                    ${sabor.quantidade === 0 ? '<div class="esgotado-tag">Indisponível</div>' : ''}
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        function carregarPedidos() {
+            const lista = document.getElementById('pedidosLista');
+            const meusPedidos = db.pedidos.filter(p => p.cliente === currentUser);
+            
+            if (meusPedidos.length === 0) {
+                lista.innerHTML = '<p style="text-align: center; color: #999;">Nenhum pedido ativo</p>';
+                return;
+            }
+            
+            lista.innerHTML = '<ul class="pedidos-lista"></ul>';
+            const ul = lista.querySelector('ul');
+            
+            meusPedidos.forEach(pedido => {
+                const li = document.createElement('li');
+                li.className = 'pedido-item';
+                li.innerHTML = `
+                    <div class="pedido-info">
+                        <div class="pedido-nome">${pedido.cliente}</div>
+                        <div class="pedido-detalhes">${pedido.quantidade} × ${pedido.saborNome}</div>
+                    </div>
+                    <div class="pedido-status ${pedido.status === 'pendente' ? 'status-pendente' : 'status-pronto'}">
+                        ${pedido.status === 'pendente' ? '⏳ Pendente' : '✅ Pronto'}
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+        }
+        
+        function carregarNotificacoes() {
+            const notifArea = document.getElementById('notificacoesArea');
+            const notifNaoLidas = db.getNotificacoesNaoLidas();
+            
+            if (notifNaoLidas.length > 0) {
+                notifArea.innerHTML = notifNaoLidas.slice(0, 3).map(notif => `
+                    <div class="notification-banner ${notif.tipo === 'success' ? 'success' : 'warning'}">
+                        <span>${notif.mensagem}</span
+                        
