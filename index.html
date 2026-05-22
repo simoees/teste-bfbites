@@ -1,19 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>BF BITES - Login</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos específicos do login */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #F9F9F9 0%, #FFFFFF 100%);
+            min-height: 100vh;
+        }
+
         .login-container {
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #F9F9F9 0%, #FFFFFF 100%);
             padding: 20px;
         }
         
@@ -72,6 +80,7 @@
             margin-bottom: 8px;
             color: #666;
             font-size: 14px;
+            font-weight: 500;
         }
         
         .input-group input {
@@ -120,7 +129,6 @@
         .btn-primary:hover {
             background: #FFB300;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
         }
         
         .btn-secondary {
@@ -133,9 +141,22 @@
             transform: translateY(-2px);
         }
         
-        .forgot-password {
+        .register-link {
             text-align: center;
             margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #C62828;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 10px;
         }
         
         .forgot-password a {
@@ -158,13 +179,9 @@
             display: none;
         }
         
-        .toast.error {
-            background: #f44336;
-        }
-        
-        .toast.success {
-            background: #4CAF50;
-        }
+        .toast.error { background: #f44336; }
+        .toast.success { background: #4CAF50; }
+        .toast.info { background: #2196F3; }
         
         @keyframes slideUp {
             from {
@@ -184,6 +201,24 @@
             margin-top: 10px;
             display: none;
         }
+        
+        .demo-credentials {
+            background: #F5F5F5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .demo-credentials p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .demo-credentials strong {
+            color: #C62828;
+        }
     </style>
 </head>
 <body>
@@ -196,22 +231,32 @@
             <div class="slogan">O sabor oficial do Barbosa Ferraz</div>
             
             <div class="input-group">
-                <label>👤 Usuário</label>
-                <input type="text" id="username" placeholder="Digite seu nome ou RA">
-                <div class="error-message" id="usernameError">Campo obrigatório</div>
+                <label>👤 Usuário ou Email</label>
+                <input type="text" id="loginUsername" placeholder="Digite seu usuário ou email">
+                <div class="error-message" id="loginUsernameError">Campo obrigatório</div>
             </div>
             
             <div class="input-group">
                 <label>🔒 Senha</label>
-                <input type="password" id="password" placeholder="********">
-                <div class="error-message" id="passwordError">Campo obrigatório</div>
+                <input type="password" id="loginPassword" placeholder="********">
+                <div class="error-message" id="loginPasswordError">Campo obrigatório</div>
             </div>
             
-            <button class="btn btn-primary" onclick="login('aluno')">🎓 Entrar como Aluno</button>
-            <button class="btn btn-secondary" onclick="login('funcionario')">👔 Entrar como Funcionário</button>
+            <button class="btn btn-primary" onclick="login()">🎓 Entrar</button>
+            <button class="btn btn-secondary" onclick="loginAsGuest()">👥 Continuar como Convidado</button>
             
             <div class="forgot-password">
-                <a href="#" onclick="showForgotPassword()">Esqueci minha senha</a>
+                <a href="#" onclick="showForgotPassword()">Esqueci minha senha?</a>
+            </div>
+            
+            <div class="register-link">
+                Não tem uma conta? <a href="cadastro.html">Cadastre-se aqui</a>
+            </div>
+            
+            <div class="demo-credentials">
+                <p>📝 <strong>Contas de demonstração:</strong></p>
+                <p>👨‍🎓 Aluno: aluno / 123</p>
+                <p>👔 Funcionário: admin / admin</p>
             </div>
             
             <div class="counter" id="counter">
@@ -226,13 +271,13 @@
         let loginAttempts = 0;
         let blockedUntil = null;
         
-        // Credenciais mockadas
-        const users = {
-            aluno: { username: 'aluno', password: '123', name: 'João Silva' },
-            funcionario: { username: 'admin', password: 'admin', name: 'Funcionário' }
+        // Banco de usuários
+        let users = {
+            aluno: { username: 'aluno', password: '123', name: 'João Silva', email: 'aluno@exemplo.com', type: 'aluno', phone: '', ra: '' },
+            admin: { username: 'admin', password: 'admin', name: 'Funcionário', email: 'admin@bfbites.com', type: 'funcionario', phone: '', ra: '' }
         };
         
-        function showToast(message, type = 'error') {
+        function showToast(message, type) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `toast ${type}`;
@@ -243,77 +288,87 @@
         }
         
         function showForgotPassword() {
-            showToast('🔧 Contate o administrador da cantina para recuperar sua senha.', 'success');
+            showToast('🔧 Contate o administrador da cantina para recuperar sua senha.', 'info');
         }
         
-        function validateFields() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            let isValid = true;
-            
-            if (!username) {
-                document.getElementById('usernameError').style.display = 'block';
-                document.getElementById('username').classList.add('error');
-                isValid = false;
-            } else {
-                document.getElementById('usernameError').style.display = 'none';
-                document.getElementById('username').classList.remove('error');
-            }
-            
-            if (!password) {
-                document.getElementById('passwordError').style.display = 'block';
-                document.getElementById('password').classList.add('error');
-                isValid = false;
-            } else {
-                document.getElementById('passwordError').style.display = 'none';
-                document.getElementById('password').classList.remove('error');
-            }
-            
-            return isValid;
+        function loginAsGuest() {
+            localStorage.setItem('userType', 'aluno');
+            localStorage.setItem('userName', 'Convidado');
+            localStorage.setItem('userLogin', 'convidado');
+            localStorage.setItem('isGuest', 'true');
+            window.location.href = 'aluno.html';
         }
         
-        function login(type) {
-            // Verificar bloqueio
+        function loadUsers() {
+            const saved = localStorage.getItem('bfbites_users');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(users, parsed);
+                } catch(e) {}
+            }
+        }
+        
+        function login() {
             if (blockedUntil && new Date() < blockedUntil) {
                 const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
-                showToast(`Aguardando ${remaining} segundos para nova tentativa`, 'error');
+                showToast(`Aguarde ${remaining} segundos`, 'error');
                 return;
             }
             
-            if (!validateFields()) return;
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            if (!username) {
+                document.getElementById('loginUsernameError').style.display = 'block';
+                document.getElementById('loginUsername').classList.add('error');
+                return;
+            }
+            if (!password) {
+                document.getElementById('loginPasswordError').style.display = 'block';
+                document.getElementById('loginPassword').classList.add('error');
+                return;
+            }
             
-            if (type === 'aluno') {
-                if (username === users.aluno.username && password === users.aluno.password) {
-                    localStorage.setItem('userType', 'aluno');
-                    localStorage.setItem('userName', users.aluno.name);
-                    loginAttempts = 0;
-                    window.location.href = 'aluno.html';
-                } else {
-                    loginAttempts++;
-                    showToast('❌ Usuário ou senha inválidos', 'error');
-                }
-            } else if (type === 'funcionario') {
-                if (username === users.funcionario.username && password === users.funcionario.password) {
-                    localStorage.setItem('userType', 'funcionario');
-                    localStorage.setItem('userName', users.funcionario.name);
-                    loginAttempts = 0;
-                    window.location.href = 'funcionario.html';
-                } else {
-                    loginAttempts++;
-                    showToast('❌ Usuário ou senha inválidos', 'error');
+            document.getElementById('loginUsernameError').style.display = 'none';
+            document.getElementById('loginPasswordError').style.display = 'none';
+            document.getElementById('loginUsername').classList.remove('error');
+            document.getElementById('loginPassword').classList.remove('error');
+            
+            let user = null;
+            
+            if (users[username] && users[username].password === password) {
+                user = users[username];
+            } else {
+                for (let key in users) {
+                    if (users[key].email === username && users[key].password === password) {
+                        user = users[key];
+                        break;
+                    }
                 }
             }
             
-            // Verificar bloqueio após 3 tentativas
+            if (user) {
+                localStorage.setItem('userType', user.type);
+                localStorage.setItem('userName', user.name);
+                localStorage.setItem('userLogin', user.username);
+                localStorage.setItem('isGuest', 'false');
+                loginAttempts = 0;
+                showToast(`✅ Bem-vindo, ${user.name}!`, 'success');
+                setTimeout(() => {
+                    if (user.type === 'aluno') window.location.href = 'aluno.html';
+                    else window.location.href = 'funcionario.html';
+                }, 500);
+            } else {
+                loginAttempts++;
+                showToast('❌ Usuário ou senha inválidos', 'error');
+            }
+            
             if (loginAttempts >= 3) {
-                blockedUntil = new Date(new Date().getTime() + 30000);
+                blockedUntil = new Date(Date.now() + 30000);
                 const counter = document.getElementById('counter');
-                const counterSeconds = document.getElementById('counterSeconds');
+                const secondsSpan = document.getElementById('counterSeconds');
                 counter.style.display = 'block';
-                
                 const interval = setInterval(() => {
                     const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
                     if (remaining <= 0) {
@@ -321,22 +376,22 @@
                         counter.style.display = 'none';
                         loginAttempts = 0;
                     } else {
-                        counterSeconds.textContent = remaining;
+                        secondsSpan.textContent = remaining;
                     }
                 }, 1000);
-                
                 showToast('🔒 Muitas tentativas! Aguarde 30 segundos.', 'error');
             }
         }
         
-        // Verificar se já está logado
-        if (localStorage.getItem('userType')) {
-            const userType = localStorage.getItem('userType');
-            if (userType === 'aluno') {
-                window.location.href = 'aluno.html';
-            } else if (userType === 'funcionario') {
-                window.location.href = 'funcionario.html';
-            }
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
+        loadUsers();
+        
+        if (localStorage.getItem('userType') && localStorage.getItem('isGuest') !== 'true') {
+            if (localStorage.getItem('userType') === 'aluno') window.location.href = 'aluno.html';
+            else if (localStorage.getItem('userType') === 'funcionario') window.location.href = 'funcionario.html';
         }
     </script>
 </body>
