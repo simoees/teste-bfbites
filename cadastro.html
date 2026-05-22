@@ -1,1 +1,502 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BF BITES - Cadastro</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cadastro-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #F9F9F9 0%, #FFFFFF 100%);
+            padding: 20px;
+        }
+        
+        .cadastro-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            color: #C62828;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .slogan {
+            text-align: center;
+            color: #FF9800;
+            font-style: italic;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #DDD;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #FFC107;
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.1);
+        }
+        
+        .input-group input.error {
+            border-color: #f44336;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+        
+        .btn-primary {
+            background: #FFC107;
+            color: #222;
+        }
+        
+        .btn-primary:hover {
+            background: #FFB300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+        }
+        
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #D0D0D0;
+            transform: translateY(-2px);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #C62828;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        .toast.success {
+            background: #4CAF50;
+        }
+        
+        .toast.info {
+            background: #2196F3;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: #EEE;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        .password-strength-text {
+            font-size: 11px;
+            margin-top: 5px;
+            color: #666;
+        }
+        
+        .termos {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .termos input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .termos label {
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .termos a {
+            color: #C62828;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="cadastro-container">
+        <div class="cadastro-card">
+            <div class="logo">
+                <div class="logo-icon">🍔</div>
+                <h1>BF BITES</h1>
+            </div>
+            <div class="slogan">Crie sua conta e faça pedidos</div>
+            
+            <div class="input-group">
+                <label>👤 Nome Completo *</label>
+                <input type="text" id="regFullName" placeholder="Digite seu nome completo">
+                <div class="error-message" id="regNameError">Nome é obrigatório</div>
+            </div>
+            
+            <div class="input-group">
+                <label>📧 Email *</label>
+                <input type="email" id="regEmail" placeholder="seuemail@exemplo.com">
+                <div class="error-message" id="regEmailError">Email válido é obrigatório</div>
+            </div>
+            
+            <div class="input-group">
+                <label>👤 Nome de Usuário *</label>
+                <input type="text" id="regUsername" placeholder="Escolha um nome de usuário">
+                <div class="error-message" id="regUsernameError">Usuário é obrigatório</div>
+            </div>
+            
+            <div class="input-group">
+                <label>🔒 Senha *</label>
+                <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" onkeyup="checkPasswordStrength()">
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                </div>
+                <div class="password-strength-text" id="passwordStrengthText"></div>
+                <div class="error-message" id="regPasswordError">Senha deve ter no mínimo 6 caracteres</div>
+            </div>
+            
+            <div class="input-group">
+                <label>🔒 Confirmar Senha *</label>
+                <input type="password" id="regConfirmPassword" placeholder="Digite a senha novamente">
+                <div class="error-message" id="regConfirmError">As senhas não coincidem</div>
+            </div>
+            
+            <div class="input-group">
+                <label>📱 Telefone (opcional)</label>
+                <input type="tel" id="regPhone" placeholder="(99) 99999-9999" oninput="maskPhone(this)">
+            </div>
+            
+            <div class="input-group">
+                <label>🏫 RA / Matrícula (opcional)</label>
+                <input type="text" id="regRa" placeholder="Número de matrícula">
+            </div>
+            
+            <div class="termos">
+                <input type="checkbox" id="termosCheck">
+                <label for="termosCheck">
+                    Li e aceito os <a href="#" onclick="showTermos()">Termos de Uso</a> e 
+                    <a href="#" onclick="showPrivacidade()">Política de Privacidade</a>
+                </label>
+            </div>
+            
+            <button class="btn btn-primary" onclick="register()">✅ Criar Conta</button>
+            <button class="btn btn-secondary" onclick="window.location.href='index.html'">🔙 Voltar para Login</button>
+            
+            <div class="login-link">
+                Já tem uma conta? <a href="index.html">Faça login</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        let users = {};
+        
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        function showTermos() {
+            alert('📜 TERMOS DE USO\n\n1. Ao realizar um pedido, você concorda em pagar o valor correspondente.\n2. Pedidos podem ser cancelados apenas antes da confirmação.\n3. O estoque é limitado e os pedidos são por ordem de chegada.\n4. Em caso de problemas, contate a cantina.\n\nAo usar o sistema, você concorda com estes termos.');
+        }
+        
+        function showPrivacidade() {
+            alert('🔒 POLÍTICA DE PRIVACIDADE\n\nSeus dados são armazenados apenas para:\n• Identificação nos pedidos\n• Histórico de compras\n• Comunicação sobre pedidos\n\nNão compartilhamos seus dados com terceiros.');
+        }
+        
+        function checkPasswordStrength() {
+            const password = document.getElementById('regPassword').value;
+            const bar = document.getElementById('passwordStrengthBar');
+            const text = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            
+            if (password.length >= 6) strength += 1;
+            if (password.length >= 10) strength += 1;
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            const width = (strength / 5) * 100;
+            bar.style.width = width + '%';
+            
+            if (strength <= 1) {
+                bar.style.background = '#f44336';
+                text.textContent = '⚠️ Senha fraca';
+                text.style.color = '#f44336';
+            } else if (strength <= 3) {
+                bar.style.background = '#FF9800';
+                text.textContent = '⚠️ Senha média';
+                text.style.color = '#FF9800';
+            } else {
+                bar.style.background = '#4CAF50';
+                text.textContent = '✅ Senha forte';
+                text.style.color = '#4CAF50';
+            }
+            
+            if (!password) {
+                bar.style.width = '0%';
+                text.textContent = '';
+            }
+        }
+        
+        function maskPhone(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length <= 2) {
+                value = value.replace(/^(\d{0,2})/, '($1');
+            } else if (value.length <= 6) {
+                value = value.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
+            } else if (value.length <= 10) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else {
+                value = value.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+            }
+            input.value = value;
+        }
+        
+        function loadUsers() {
+            const savedUsers = localStorage.getItem('bfbites_users');
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            }
+        }
+        
+        function saveUsers() {
+            localStorage.setItem('bfbites_users', JSON.stringify(users));
+        }
+        
+        function validateRegister() {
+            const fullName = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const termos = document.getElementById('termosCheck').checked;
+            let isValid = true;
+            
+            // Validar nome
+            if (!fullName.trim()) {
+                document.getElementById('regNameError').style.display = 'block';
+                document.getElementById('regFullName').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regNameError').style.display = 'none';
+                document.getElementById('regFullName').classList.remove('error');
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                document.getElementById('regEmailError').style.display = 'block';
+                document.getElementById('regEmail').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regEmailError').style.display = 'none';
+                document.getElementById('regEmail').classList.remove('error');
+            }
+            
+            // Validar username
+            if (!username.trim()) {
+                document.getElementById('regUsernameError').textContent = 'Usuário é obrigatório';
+                document.getElementById('regUsernameError').style.display = 'block';
+                document.getElementById('regUsername').classList.add('error');
+                isValid = false;
+            } else if (users[username] || username === 'aluno' || username === 'admin') {
+                document.getElementById('regUsernameError').textContent = 'Usuário já existe';
+                document.getElementById('regUsernameError').style.display = 'block';
+                document.getElementById('regUsername').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regUsernameError').style.display = 'none';
+                document.getElementById('regUsername').classList.remove('error');
+            }
+            
+            // Validar senha
+            if (!password || password.length < 6) {
+                document.getElementById('regPasswordError').style.display = 'block';
+                document.getElementById('regPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regPasswordError').style.display = 'none';
+                document.getElementById('regPassword').classList.remove('error');
+            }
+            
+            // Validar confirmação
+            if (password !== confirmPassword) {
+                document.getElementById('regConfirmError').style.display = 'block';
+                document.getElementById('regConfirmPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regConfirmError').style.display = 'none';
+                document.getElementById('regConfirmPassword').classList.remove('error');
+            }
+            
+            // Validar termos
+            if (!termos) {
+                showToast('Você precisa aceitar os Termos de Uso', 'error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function register() {
+            if (!validateRegister()) return;
+            
+            const fullName = document.getElementById('regFullName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('regPhone').value;
+            const ra = document.getElementById('regRa').value;
+            
+            // Criar novo usuário
+            const newUser = {
+                username: username,
+                password: password,
+                name: fullName,
+                email: email,
+                phone: phone,
+                ra: ra,
+                type: 'aluno',
+                createdAt: new Date().toISOString()
+            };
+            
+            users[username] = newUser;
+            saveUsers();
+            
+            showToast('✅ Cadastro realizado com sucesso! Faça login.', 'success');
+            
+            // Redirecionar para login após 2 segundos
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        // Inicializar
+        loadUsers();
+        
+        // Adicionar evento de Enter
+        document.getElementById('regConfirmPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') register();
+        });
+    </script>
+</body>
+</html>
