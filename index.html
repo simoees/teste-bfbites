@@ -152,6 +152,11 @@
             color: #C62828;
             text-decoration: none;
             font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
         }
         
         .forgot-password {
@@ -250,7 +255,7 @@
             </div>
             
             <div class="register-link">
-                Não tem uma conta? <a href="cadastro.html">Cadastre-se aqui</a>
+                Não tem uma conta? <a href="javascript:void(0)" onclick="irParaCadastro()">Cadastre-se aqui</a>
             </div>
             
             <div class="demo-credentials">
@@ -276,6 +281,10 @@
             aluno: { username: 'aluno', password: '123', name: 'João Silva', email: 'aluno@exemplo.com', type: 'aluno', phone: '', ra: '' },
             admin: { username: 'admin', password: 'admin', name: 'Funcionário', email: 'admin@bfbites.com', type: 'funcionario', phone: '', ra: '' }
         };
+        
+        function irParaCadastro() {
+            window.location.href = 'cadastro.html';
+        }
         
         function showToast(message, type) {
             const toast = document.getElementById('toast');
