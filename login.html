@@ -1,1 +1,432 @@
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BF BITES - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos específicos do login */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #F9F9F9 0%, #FFFFFF 100%);
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            color: #C62828;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .slogan {
+            text-align: center;
+            color: #FF9800;
+            font-style: italic;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #DDD;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #FFC107;
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.1);
+        }
+        
+        .input-group input.error {
+            border-color: #f44336;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+        
+        .btn-primary {
+            background: #FFC107;
+            color: #222;
+        }
+        
+        .btn-primary:hover {
+            background: #FFB300;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+        }
+        
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #D0D0D0;
+            transform: translateY(-2px);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #C62828;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .forgot-password a {
+            color: #2196F3;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        .toast.success {
+            background: #4CAF50;
+        }
+        
+        .toast.info {
+            background: #2196F3;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .counter {
+            text-align: center;
+            color: #f44336;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .demo-credentials {
+            background: #F5F5F5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .demo-credentials p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .demo-credentials strong {
+            color: #C62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">🍔</div>
+                <h1>BF BITES</h1>
+            </div>
+            <div class="slogan">O sabor oficial do Barbosa Ferraz</div>
+            
+            <div class="input-group">
+                <label>👤 Usuário ou Email</label>
+                <input type="text" id="loginUsername" placeholder="Digite seu usuário ou email">
+                <div class="error-message" id="loginUsernameError">Campo obrigatório</div>
+            </div>
+            
+            <div class="input-group">
+                <label>🔒 Senha</label>
+                <input type="password" id="loginPassword" placeholder="********">
+                <div class="error-message" id="loginPasswordError">Campo obrigatório</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="login()">🎓 Entrar</button>
+            <button class="btn btn-secondary" onclick="loginAsGuest()">👥 Continuar como Convidado</button>
+            
+            <div class="forgot-password">
+                <a href="#" onclick="showForgotPassword()">Esqueci minha senha?</a>
+            </div>
+            
+            <div class="register-link">
+                Não tem uma conta? <a href="cadastro.html">Cadastre-se aqui</a>
+            </div>
+            
+            <div class="demo-credentials">
+                <p>📝 <strong>Contas de demonstração:</strong></p>
+                <p>👨‍🎓 Aluno: aluno / 123</p>
+                <p>👔 Funcionário: admin / admin</p>
+            </div>
+            
+            <div class="counter" id="counter">
+                ⏱️ Aguarde <span id="counterSeconds">30</span> segundos
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script src="dados.js"></script>
+    <script>
+        let loginAttempts = 0;
+        let blockedUntil = null;
+        
+        // Banco de usuários local
+        let users = {
+            aluno: { username: 'aluno', password: '123', name: 'João Silva', email: 'aluno@exemplo.com', type: 'aluno' },
+            funcionario: { username: 'admin', password: 'admin', name: 'Funcionário', email: 'admin@bfbites.com', type: 'funcionario' }
+        };
+        
+        // Carregar usuários cadastrados
+        function loadUsers() {
+            const savedUsers = localStorage.getItem('bfbites_users');
+            if (savedUsers) {
+                const parsed = JSON.parse(savedUsers);
+                Object.assign(users, parsed);
+            }
+        }
+        
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        function showForgotPassword() {
+            showToast('🔧 Contate o administrador da cantina para recuperar sua senha.', 'info');
+        }
+        
+        function loginAsGuest() {
+            localStorage.setItem('userType', 'aluno');
+            localStorage.setItem('userName', 'Convidado');
+            localStorage.setItem('isGuest', 'true');
+            window.location.href = 'aluno.html';
+        }
+        
+        function validateLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            let isValid = true;
+            
+            if (!username.trim()) {
+                document.getElementById('loginUsernameError').style.display = 'block';
+                document.getElementById('loginUsername').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('loginUsernameError').style.display = 'none';
+                document.getElementById('loginUsername').classList.remove('error');
+            }
+            
+            if (!password.trim()) {
+                document.getElementById('loginPasswordError').style.display = 'block';
+                document.getElementById('loginPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('loginPasswordError').style.display = 'none';
+                document.getElementById('loginPassword').classList.remove('error');
+            }
+            
+            return isValid;
+        }
+        
+        function login() {
+            // Verificar bloqueio
+            if (blockedUntil && new Date() < blockedUntil) {
+                const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
+                showToast(`Aguardando ${remaining} segundos para nova tentativa`, 'error');
+                return;
+            }
+            
+            if (!validateLogin()) return;
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            // Buscar usuário por username ou email
+            let user = null;
+            
+            // Verificar por username
+            if (users[username] && users[username].password === password) {
+                user = users[username];
+            } else {
+                // Verificar por email
+                for (let key in users) {
+                    if (users[key].email === username && users[key].password === password) {
+                        user = users[key];
+                        break;
+                    }
+                }
+            }
+            
+            if (user) {
+                localStorage.setItem('userType', user.type);
+                localStorage.setItem('userName', user.name);
+                localStorage.setItem('userLogin', user.username);
+                localStorage.setItem('isGuest', 'false');
+                loginAttempts = 0;
+                
+                showToast(`✅ Bem-vindo, ${user.name}!`, 'success');
+                
+                setTimeout(() => {
+                    if (user.type === 'aluno') {
+                        window.location.href = 'aluno.html';
+                    } else {
+                        window.location.href = 'funcionario.html';
+                    }
+                }, 500);
+            } else {
+                loginAttempts++;
+                showToast('❌ Usuário ou senha inválidos', 'error');
+            }
+            
+            // Verificar bloqueio após 3 tentativas
+            if (loginAttempts >= 3) {
+                blockedUntil = new Date(new Date().getTime() + 30000);
+                const counter = document.getElementById('counter');
+                const counterSeconds = document.getElementById('counterSeconds');
+                counter.style.display = 'block';
+                
+                const interval = setInterval(() => {
+                    const remaining = Math.ceil((blockedUntil - new Date()) / 1000);
+                    if (remaining <= 0) {
+                        clearInterval(interval);
+                        counter.style.display = 'none';
+                        loginAttempts = 0;
+                    } else {
+                        counterSeconds.textContent = remaining;
+                    }
+                }, 1000);
+                
+                showToast('🔒 Muitas tentativas! Aguarde 30 segundos.', 'error');
+            }
+        }
+        
+        // Adicionar evento de Enter
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
+        document.getElementById('loginUsername').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
+        // Inicializar
+        loadUsers();
+        
+        // Verificar se já está logado
+        if (localStorage.getItem('userType') && localStorage.getItem('isGuest') !== 'true') {
+            const userType = localStorage.getItem('userType');
+            if (userType === 'aluno') {
+                window.location.href = 'aluno.html';
+            } else if (userType === 'funcionario') {
+                window.location.href = 'funcionario.html';
+            }
+        }
+    </script>
+</body>
+</html>
