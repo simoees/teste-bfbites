@@ -1,4 +1,3 @@
-
 /* Reset e estilos globais */
 * {
     margin: 0;
@@ -109,7 +108,7 @@ body {
 /* Cards de sabores */
 .sabores-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 12px;
 }
 
@@ -117,12 +116,14 @@ body {
     background: #F9F9F9;
     border-radius: 12px;
     padding: 16px;
+    text-align: center;
     border: 1px solid #DDD;
     transition: all 0.3s;
 }
 
 .sabor-card.esgotado {
     opacity: 0.5;
+    background: #EEE;
 }
 
 .sabor-icon {
@@ -137,7 +138,7 @@ body {
 }
 
 .sabor-quantidade {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
 }
 
@@ -323,7 +324,101 @@ body {
     border-left-color: #FF9800;
 }
 
-/* Estoque grid */
+/* Rodapé */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    border-top: 1px solid #DDD;
+    z-index: 90;
+}
+
+.footer button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.footer button:hover {
+    background: #F0F0F0;
+}
+
+/* Input group */
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    z-index: 2000;
+    animation: slideUp 0.3s ease;
+    display: none;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+.toast.success {
+    background: #4CAF50;
+}
+
+.toast.info {
+    background: #2196F3;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Scroll */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F1F1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #C62828;
+    border-radius: 3px;
+}
+
+/* Estoque grid (para funcionário) */
 .estoque-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -354,46 +449,4 @@ body {
 
 .estoque-valor.zerado {
     color: #f44336;
-}
-
-/* Rodapé */
-.footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    padding: 12px 20px;
-    display: flex;
-    justify-content: space-around;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-    border-top: 1px solid #DDD;
-}
-
-.footer button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.footer button:hover {
-    background: #F0F0F0;
-}
-
-/* Scroll */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: #F1F1F1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #C62828;
-    border-radius: 3px;
 }
